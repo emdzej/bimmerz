@@ -1,0 +1,58 @@
+/**
+ * Shared CSS variables for the bimmerz Tailwind preset — same zinc-based
+ * palette every app in the family uses. Drop into an app's `app.css`
+ * via:
+ *
+ *   @tailwind base;
+ *   @tailwind components;
+ *   @tailwind utilities;
+ *   @import "@emdzej/bimmerz-theme/tokens.css";
+ *
+ * Light theme is the `:root` baseline; dark theme is layered onto the
+ * `.dark` class on `<html>`. `applyTheme()` from the JS API toggles
+ * that class based on the user's preference.
+ */
+
+@layer base {
+  :root {
+    --theme-bg: 255 255 255;
+    --theme-surface: 244 244 245;
+    --theme-elevated: 228 228 231;
+    --theme-border-strong: 212 212 216;
+    --theme-border-subtle: 228 228 231;
+    --theme-text-primary: 24 24 27;
+    --theme-text-secondary: 63 63 70;
+    --theme-text-muted: 113 113 122;
+  }
+
+  .dark {
+    --theme-bg: 9 9 11;
+    --theme-surface: 24 24 27;
+    --theme-elevated: 39 39 42;
+    --theme-border-strong: 39 39 42;
+    --theme-border-subtle: 39 39 42;
+    --theme-text-primary: 244 244 245;
+    --theme-text-secondary: 212 212 216;
+    --theme-text-muted: 113 113 122;
+  }
+
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: rgb(var(--theme-elevated));
+    border-radius: 4px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--theme-border-strong));
+  }
+
+  body {
+    background: rgb(var(--theme-bg));
+    color: rgb(var(--theme-text-primary));
+  }
+}

@@ -1,0 +1,12 @@
+node_modules/
+.pnpm-debug.log
+.pnpm-store/
+dist/
+**/dist/
+.DS_Store
+
+# Turborepo
+.turbo
+
+# IDE — local debugger / workspace prefs
+.vscode/
