@@ -12,7 +12,7 @@ sibling repos consume them as ordinary npm dependencies.
 
 | Package | Purpose |
 |---|---|
-| [`@emdzej/bimmerz-logger`](packages/logger) | pino-backed logger wrapper. Isomorphic (Node + browser), env-driven level, per-module child loggers. |
+| [`@emdzej/bimmerz-logger`](packages/logger) | Structured logger with pino-shape API. Hierarchical categories (`EDIABASX.parser` walks up to `EDIABASX`), runtime-mutable central config, pluggable sinks (console / pino / buffer / multi). No env reads — apps configure via `configureLogger({...})`. Tree-shake-friendly; web bundles don't ship pino. |
 | [`@emdzej/bimmerz-theme`](packages/theme) | Tailwind preset + CSS variables. `bg-base` / `bg-surface` / `text-foreground` / `border-divider` token system. Light/dark via class. |
 | [`@emdzej/bimmerz-ui`](packages/ui) | Svelte 5 components. Source-only — consumer apps compile via their own Vite. |
 

@@ -1,61 +1,37 @@
 /**
- * Shared pino logger wrapper for the bimmerz family.
+ * `@emdzej/bimmerz-logger` — shared structured logger for the bimmerz
+ * family. See `README.md` for the design rationale and migration
+ * notes; the in-source doc on each export carries the API details.
  *
- * Apps that consume this package get a single root logger plus a
- * `getLogger(module)` factory for per-module child loggers. Level is
- * env-driven (`BIMMERZ_LOG_LEVEL` overrides the default) so test runs
- * can crank up to `debug` without code changes; production builds
- * default to `info` with no pretty transport (lean bundle).
- *
- * Isomorphic — guards `process` so the module imports cleanly inside
- * a browser bundle where `process.env` may be a stub.
+ * Pino-shape `Logger` interface, hierarchical category resolution,
+ * runtime-mutable central config, pluggable sink. Tree-shake-friendly
+ * — the default entry doesn't pull pino in, so web bundles stay light.
+ * Apps that want pino's JSON/pretty/file transports import the sink
+ * from `@emdzej/bimmerz-logger/sinks/pino`.
  */
 
-import pino from "pino";
+import { setDefaultSink } from './logger.js';
+import { consoleSink } from './sinks/console.js';
 
-export type LogLevel = "trace" | "debug" | "info" | "warn" | "error" | "fatal" | "silent";
+// Install the default sink at module load. Apps can override via
+// `configureLogger({ sink: … })` any time; this just ensures
+// imports that never call `configureLogger` still emit somewhere.
+setDefaultSink(consoleSink());
 
-export interface LoggerOptions {
-  level?: LogLevel;
-  name?: string;
-  pretty?: boolean;
-  /** File path for headless / TUI flows; ignored in the browser. */
-  destination?: string;
-}
+export { configureLogger, getLogger, getLoggerConfig } from './logger.js';
+export { resolveLevel } from './categories.js';
+export { LEVEL_VALUES, levelPasses } from './levels.js';
 
-const envLevel =
-  typeof process !== "undefined" && process.env?.BIMMERZ_LOG_LEVEL
-    ? (process.env.BIMMERZ_LOG_LEVEL as LogLevel)
-    : undefined;
+export { bufferSink, type BufferSink, type BufferSinkOptions } from './sinks/buffer.js';
+export { consoleSink, type ConsoleSinkOptions } from './sinks/console.js';
+export { multiSink } from './sinks/multi.js';
+export { nullSink } from './sinks/null.js';
 
-const envIsProd =
-  typeof process !== "undefined" && process.env?.NODE_ENV === "production";
-
-const defaultLevel: LogLevel = envLevel ?? "info";
-const isPretty = !envIsProd;
-
-export function createLogger(options: LoggerOptions = {}): pino.Logger {
-  const level = options.level ?? defaultLevel;
-
-  const transport = options.destination
-    ? { target: "pino/file", options: { destination: options.destination } }
-    : (options.pretty ?? isPretty)
-      ? { target: "pino-pretty", options: { colorize: true } }
-      : undefined;
-
-  return pino({
-    level,
-    name: options.name,
-    transport,
-  });
-}
-
-/** Root logger — child loggers inherit its level. */
-export const logger = createLogger({ name: "bimmerz" });
-
-/** Child-logger factory keyed by module name (`getLogger("transport")`). */
-export function getLogger(module: string): pino.Logger {
-  return logger.child({ module });
-}
-
-export type { Logger } from "pino";
+export type {
+  LogBindings,
+  LogLevel,
+  LogRecord,
+  Logger,
+  LoggerConfig,
+  Sink,
+} from './types.js';
